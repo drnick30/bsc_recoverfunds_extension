@@ -32,9 +32,9 @@ const { publicKeyConvert } = require("ethereum-cryptography/secp256k1");
 
 // Fill in values for following variables:
 // Enter the address you want to find (the one where your funds are):
-const targetAddr = "0xFc6Ea01e2fd171b00b10e99060bcDD884b8EE0D4".toLowerCase();
+const targetAddr = "your address".toLowerCase();
 // Fill in the Ledger Recovery Phrase below (24 words)
-const mnemonic = "stay army reward era enact enhance theory zero bottom pattern network gym skate catalog rice custom car other relax bus person upon dutch airport";
+const mnemonic = "your seed";
 
 // And optionally
 // If you used a passphrase on your Ledger Device (the "25th" word),
