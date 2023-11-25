@@ -32,17 +32,17 @@ const { publicKeyConvert } = require("ethereum-cryptography/secp256k1");
 
 // Fill in values for following variables:
 // Enter the address you want to find (the one where your funds are):
-const targetAddr = "0xFc6Ea01e2fd171b00b10e99060bcDD884b8EE0D4".toLowerCase();
+const targetAddr = "".toLowerCase();
 // Fill in the Ledger Recovery Phrase below (24 words)
-const mnemonic = "stay army reward era enact enhance theory zero bottom pattern network gym skate catalog rice custom car other relax bus person upon dutch airport";
+const mnemonic = "";
 
 // And optionally
 // If you used a passphrase on your Ledger Device (the "25th" word),
 // Enter it below or otherwise leave as is
 const passphrase = "";
 
-const pathIterations = 500;
-const childIterations = 500;
+const pathIterations = 50;
+const childIterations = 50;
 
 
 
@@ -54,24 +54,6 @@ function getAddress(comprPub) {
     return `0x${keccak256(uncomprPub.slice(1)).toString("hex").slice(64-40)}`;
 }
 
-function tryPath(p) {
-  parent = hdkey.derive(p);
-  parentAddr = getAddress(parent.publicKey);
-  for(let j = 0; j < childIterations; j++) {
-    child = parent.deriveChild(j);
-    childAddr = getAddress(child.publicKey);
-    if(childAddr == targetAddr) {
-      console.log(`Parent address: ${parentAddr}`);
-      console.log(`Derivation path ${p}`);
-      console.log(`Child ${j} address: ${childAddr}`);
-      console.log(`Child Private Key: ${child.privateKey.toString("hex")}`);
-      console.log("---");
-      return 1;
-    }
-  }
-  return 0;
-}
-
 let path;
 let parent;
 let parentAddr;
@@ -79,19 +61,22 @@ let child;
 let childAddr;
 
 for(let k = 0; k < pathIterations; k++) {
-  let path = `m/44'/60'/${k}'`
-  let res = tryPath(path);
-  if(res === 1) { return; }
-  for(let i = 0; i < pathIterations; i++) {
-    path = `m/44'/60'/${k}'/${i}`;
-    res = tryPath(path);
-    if(res === 1) { return; }
-    for(let j = 0; j < pathIterations; j++) {
-      path = `m/44'/60'/${k}'/${i}/${j}`;
-      res = tryPath(path);
-      if(res === 1) { return; }
+    for(let i = 0; i < pathIterations; i++) {
+        // If unlucky with this derivation path, one can try to mess around with different derivation paths
+        path = `m/44'/60'/${k}'/${i}`;
+        parent = hdkey.derive(path);
+        parentAddr = getAddress(parent.publicKey);
+        for(let j = 0; j < childIterations; j++) {
+            child = parent.deriveChild(j);
+            childAddr = getAddress(child.publicKey);
+            if(childAddr == targetAddr) {
+              console.log(`Parent address: ${parentAddr}`);
+              console.log(`Derivation path ${path}`);
+              console.log(`Child ${j} address: ${childAddr}`);
+              console.log(`Child Private Key: ${child.privateKey.toString("hex")}`);
+              console.log("---");
+              return;
+            }
+          }
     }
-  }
 }
-
-console.log("Address was not found.");
